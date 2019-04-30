@@ -1,0 +1,39 @@
+package com.jaspervanmerle.vrtcontest2019.validator
+
+import com.jaspervanmerle.vrtcontest2019.model.Location
+import com.jaspervanmerle.vrtcontest2019.model.Worker
+import com.jaspervanmerle.vrtcontest2019.model.action.ArriveAction
+import com.jaspervanmerle.vrtcontest2019.model.action.StartAction
+import com.jaspervanmerle.vrtcontest2019.model.action.WorkAction
+
+class CorrectDistancesValidator : Validator() {
+    override fun validate(locations: List<Location>, workers: List<Worker>) {
+        for (worker in workers) {
+            for ((actionA, actionB) in worker.actions.zipWithNext()) {
+                if (actionA.location != actionB.location) {
+                    val timeA = when (actionA) {
+                        is StartAction -> actionA.time
+                        is ArriveAction -> actionA.time
+                        is WorkAction -> actionA.endTime
+                        else -> 0
+                    }
+
+                    val timeB = when (actionB) {
+                        is StartAction -> actionB.time
+                        is ArriveAction -> actionB.time
+                        is WorkAction -> actionB.startTime
+                        else -> 0
+                    }
+
+                    val dx = Math.abs(actionA.location.x - actionB.location.x)
+                    val dy = Math.abs(actionA.location.y - actionB.location.y)
+                    val timeDifference = Math.abs(timeA - timeB)
+
+                    if (dx + dy < timeDifference) {
+                        throw Error("There's not enough time to travel between location ${actionA.location.id} and location ${actionB.location.id} (required time is ${dx + dy}, time difference between actions is $timeDifference)")
+                    }
+                }
+            }
+        }
+    }
+}
