@@ -14,8 +14,6 @@ class Strategy(val locations: List<Location>) {
         val jobs = locations.subList(1, locations.size).sortedBy { it.endTime }
 
         for (job in jobs) {
-            val distanceFromBase = base.distanceTo(job)
-
             val availableWorkers = mutableListOf<Pair<Worker, Int>>()
 
             for (worker in workers) {
@@ -30,15 +28,6 @@ class Strategy(val locations: List<Location>) {
             val newWorkers = job.requiredWorkers - existingWorkers.size
 
             val startTime = getJobStartTime(job, existingWorkers)
-
-            var costs = job.requiredWorkers * job.duration + newWorkers + distanceFromBase
-            for (worker in existingWorkers) {
-                costs += startTime - worker.first.workingUntil
-            }
-
-            if (costs > job.reward) {
-                continue
-            }
 
             for (worker in existingWorkers) {
                 worker.first.addAction(ArriveAction(job, startTime))

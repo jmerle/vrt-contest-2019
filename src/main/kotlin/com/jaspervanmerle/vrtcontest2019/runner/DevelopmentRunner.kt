@@ -47,10 +47,12 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
             val formattedScore = numberFormat.format(score)
             val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
 
-            println("Score for test $testName (${locations.size} locations, ${jobs.size} completed jobs, ${workers.size} workers): $formattedScore")
+            println("Score for test $testName (${jobs.size} / ${locations.size - 1} completed jobs, ${workers.size} workers): $formattedScore")
         }
 
-        println("Total score: $totalScore")
+        if (args.size > 1) {
+            println("Total score: $totalScore")
+        }
     }
 
     private fun getScore(workers: List<Worker>): Double {
