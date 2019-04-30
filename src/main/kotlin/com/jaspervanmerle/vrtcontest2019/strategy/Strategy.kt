@@ -11,7 +11,7 @@ class Strategy(val locations: List<Location>) {
     val workers = mutableListOf<Worker>()
 
     fun execute(): List<Worker> {
-        val jobs = locations.subList(1, locations.size).sortedBy { it.startTime }
+        val jobs = locations.subList(1, locations.size).sortedBy { it.endTime }
 
         for (job in jobs) {
             val distanceFromBase = base.distanceTo(job)
