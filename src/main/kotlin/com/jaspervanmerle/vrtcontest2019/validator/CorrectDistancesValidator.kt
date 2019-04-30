@@ -25,7 +25,7 @@ class CorrectDistancesValidator : Validator() {
                         else -> 0
                     }
 
-                    val distance = actionA.location.getDistance(actionB.location)
+                    val distance = actionA.location.distanceTo(actionB.location)
                     val timeDifference = Math.abs(timeA - timeB)
 
                     if (distance > timeDifference) {

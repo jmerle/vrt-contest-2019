@@ -41,7 +41,9 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
             }
 
             val score = getScore(locations, workers)
-            println("Score for test $testName: ${numberFormat.format(score)}")
+            val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
+
+            println("Score for test $testName (${jobs.size} jobs, ${workers.size} workers): ${numberFormat.format(score)}")
         }
     }
 

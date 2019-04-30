@@ -7,40 +7,76 @@ import com.jaspervanmerle.vrtcontest2019.model.action.WorkAction
 
 class Strategy(val locations: List<Location>) {
     val base = locations[0]
-    val jobs = locations.subList(1, locations.size)
 
     val workers = mutableListOf<Worker>()
 
     fun execute(): List<Worker> {
+        val jobs = locations.subList(1, locations.size).sortedBy { it.startTime }
+
         for (job in jobs) {
-            if (isProfitable(job) && isPossible(job)) {
-                val distance = base.getDistance(job)
+            val availableWorkers = mutableListOf<Pair<Worker, Int>>()
 
-                for (i in 0 until job.requiredWorkers) {
-                    var arrivalTime = job.startTime - distance
+            for (worker in workers) {
+                val bestArrivalTime = worker.getBestArrivalTime(job)
 
-                    if (arrivalTime < 0) {
-                        arrivalTime = 0
-                    }
-
-                    val arrivalAtJob = arrivalTime + distance
-                    val workEndTime = arrivalAtJob + job.duration
-                    val arrivalBackAtBase = workEndTime + distance
-
-                    val worker = Worker(base, arrivalTime)
-                    worker.actions += ArriveAction(job, arrivalAtJob)
-                    worker.actions += WorkAction(job, arrivalAtJob, workEndTime)
-                    worker.actions += ArriveAction(base, arrivalBackAtBase)
-                    workers += worker
+                if (bestArrivalTime <= job.latestPossibleArrival) {
+                    availableWorkers += worker to bestArrivalTime
                 }
             }
+
+            val existingWorkers = availableWorkers.sortedBy { it.second }.take(job.requiredWorkers)
+            val requiredNewWorkers = job.requiredWorkers - existingWorkers.size
+
+            val startTime = getJobStartTime(job, existingWorkers)
+
+            for (worker in existingWorkers) {
+                worker.first.addAction(ArriveAction(job, startTime))
+                worker.first.addAction(WorkAction(job, startTime, startTime + job.duration))
+                worker.first.workingUntil = startTime + job.duration
+            }
+
+            for (i in 0 until requiredNewWorkers) {
+                val worker = Worker(base, startTime - base.distanceTo(job))
+                worker.addAction(ArriveAction(job, startTime))
+                worker.addAction(WorkAction(job, startTime, startTime + job.duration))
+                worker.workingUntil = startTime + job.duration
+                workers += worker
+            }
+        }
+
+        for (worker in workers) {
+            val latestWorkAction = worker.actions.last() as WorkAction
+            worker.addAction(ArriveAction(base, latestWorkAction.endTime + worker.location.distanceTo(base)))
         }
 
         return workers
     }
 
+    private fun getJobStartTime(job: Location, existingAvailableWorkers: List<Pair<Worker, Int>>): Int {
+        val distanceFromBase = base.distanceTo(job)
+        val requiredNewWorkers = job.requiredWorkers - existingAvailableWorkers.size
+
+        var earliestStart = if (existingAvailableWorkers.isEmpty()) {
+            job.startTime
+        } else {
+            existingAvailableWorkers.maxBy { it.second }!!.second
+        }
+
+        if (requiredNewWorkers > 0) {
+            if (earliestStart < distanceFromBase) {
+                earliestStart = distanceFromBase
+            }
+        }
+
+        if (earliestStart < job.startTime) {
+            earliestStart = job.startTime
+        }
+
+        return earliestStart
+    }
+
     private fun isProfitable(job: Location): Boolean {
-        val distance = base.getDistance(job)
+        val distance = base.distanceTo(job)
 
         val transportationCosts = job.requiredWorkers * distance * 2
         val workingCosts = job.requiredWorkers * job.duration
@@ -50,7 +86,7 @@ class Strategy(val locations: List<Location>) {
     }
 
     private fun isPossible(job: Location): Boolean {
-        val distance = base.getDistance(job)
+        val distance = base.distanceTo(job)
         return job.endTime - job.duration >= distance
     }
 }
