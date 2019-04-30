@@ -40,14 +40,15 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
                 println()
             }
 
-            val score = getScore(locations, workers)
+            val score = getScore(workers)
             val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
 
-            println("Score for test $testName (${jobs.size} jobs, ${workers.size} workers): ${numberFormat.format(score)}")
+            val formattedScore = numberFormat.format(score)
+            println("Score for test $testName (${locations.size} locations, ${jobs.size} completed jobs, ${workers.size} workers): $formattedScore")
         }
     }
 
-    private fun getScore(locations: List<Location>, workers: List<Worker>): Double {
+    private fun getScore(workers: List<Worker>): Double {
         val completedLocations: MutableSet<Location> = mutableSetOf()
 
         var rewardedCredits = 0
