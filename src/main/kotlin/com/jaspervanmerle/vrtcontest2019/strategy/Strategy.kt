@@ -74,19 +74,4 @@ class Strategy(val locations: List<Location>) {
 
         return earliestStart
     }
-
-    private fun isProfitable(job: Location): Boolean {
-        val distance = base.distanceTo(job)
-
-        val transportationCosts = job.requiredWorkers * distance * 2
-        val workingCosts = job.requiredWorkers * job.duration
-        val startingCosts = job.requiredWorkers * 240
-
-        return transportationCosts + workingCosts + startingCosts < job.reward
-    }
-
-    private fun isPossible(job: Location): Boolean {
-        val distance = base.distanceTo(job)
-        return job.endTime - job.duration >= distance
-    }
 }
