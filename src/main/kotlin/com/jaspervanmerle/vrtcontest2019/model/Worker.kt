@@ -8,7 +8,6 @@ class Worker(startLocation: Location, startTime: Int) {
     var location = startLocation
 
     var workingUntil = startTime
-    lateinit var currentLocation: Location
 
     fun getBestArrivalTime(job: Location): Int {
         return workingUntil + location.distanceTo(job)

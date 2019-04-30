@@ -25,9 +25,19 @@ class Strategy(val locations: List<Location>) {
             }
 
             val existingWorkers = availableWorkers.sortedBy { it.second }.take(job.requiredWorkers)
-            val requiredNewWorkers = job.requiredWorkers - existingWorkers.size
+            val newWorkers = job.requiredWorkers - existingWorkers.size
 
             val startTime = getJobStartTime(job, existingWorkers)
+            val distanceFromBase = base.distanceTo(job)
+
+            var costs = job.requiredWorkers * job.duration + newWorkers + distanceFromBase
+            for (worker in existingWorkers) {
+                costs += startTime - worker.first.workingUntil
+            }
+
+            if (costs > job.reward) {
+                continue
+            }
 
             for (worker in existingWorkers) {
                 worker.first.addAction(ArriveAction(job, startTime))
@@ -35,7 +45,7 @@ class Strategy(val locations: List<Location>) {
                 worker.first.workingUntil = startTime + job.duration
             }
 
-            for (i in 0 until requiredNewWorkers) {
+            for (i in 0 until newWorkers) {
                 val worker = Worker(base, startTime - base.distanceTo(job))
                 worker.addAction(ArriveAction(job, startTime))
                 worker.addAction(WorkAction(job, startTime, startTime + job.duration))
