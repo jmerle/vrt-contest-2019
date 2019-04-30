@@ -5,15 +5,13 @@ import com.jaspervanmerle.vrtcontest2019.model.Worker
 import com.jaspervanmerle.vrtcontest2019.model.action.ArriveAction
 import com.jaspervanmerle.vrtcontest2019.model.action.WorkAction
 
-class Strategy(val locations: List<Location>) {
-    val base = locations[0]
-
+class Strategy(val base: Location, val jobs: List<Location>) {
     val workers = mutableListOf<Worker>()
 
     fun execute(): List<Worker> {
-        val jobs = locations.subList(1, locations.size).sortedBy { it.endTime }
+        val sortedJobs = jobs.sortedBy { it.endTime }
 
-        for (job in jobs) {
+        for (job in sortedJobs) {
             val availableWorkers = mutableListOf<Pair<Worker, Int>>()
 
             for (worker in workers) {
@@ -46,7 +44,7 @@ class Strategy(val locations: List<Location>) {
 
         for (worker in workers) {
             val latestWorkAction = worker.actions.last() as WorkAction
-            worker.addAction(ArriveAction(base, latestWorkAction.endTime + worker.location.distanceTo(base)))
+            worker.addAction(ArriveAction(base, latestWorkAction.endTime + worker.distanceTo(base)))
         }
 
         return workers

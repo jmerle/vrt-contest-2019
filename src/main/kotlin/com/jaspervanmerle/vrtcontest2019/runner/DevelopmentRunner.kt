@@ -6,7 +6,6 @@ import com.jaspervanmerle.vrtcontest2019.model.Worker
 import com.jaspervanmerle.vrtcontest2019.model.action.ArriveAction
 import com.jaspervanmerle.vrtcontest2019.model.action.StartAction
 import com.jaspervanmerle.vrtcontest2019.model.action.WorkAction
-import com.jaspervanmerle.vrtcontest2019.strategy.Strategy
 import com.jaspervanmerle.vrtcontest2019.validator.*
 import java.io.File
 import java.text.NumberFormat
@@ -30,7 +29,7 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
         for (testName in args) {
             val ir = InputReader(File("src/main/resources/tests/$testName.txt"))
             val locations = readLocations(ir)
-            val workers = Strategy(locations).execute()
+            val workers = executeStrategy(locations)
 
             for (validator in validators) {
                 validator.validate(locations, workers)
@@ -47,7 +46,7 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
             val formattedScore = numberFormat.format(score)
             val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
 
-            println("Score for test $testName (${jobs.size} / ${locations.size - 1} completed jobs, ${workers.size} workers): $formattedScore")
+            println("Score for test $testName (${jobs.size} / ${locations.size - 1} completed jobs with ${workers.size} workers): $formattedScore")
         }
 
         if (args.size > 1) {
