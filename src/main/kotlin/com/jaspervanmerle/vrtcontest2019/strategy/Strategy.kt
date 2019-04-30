@@ -5,8 +5,8 @@ import com.jaspervanmerle.vrtcontest2019.model.Worker
 import com.jaspervanmerle.vrtcontest2019.model.action.ArriveAction
 import com.jaspervanmerle.vrtcontest2019.model.action.WorkAction
 
-class Strategy(val base: Location, val jobs: List<Location>) {
-    val workers = mutableListOf<Worker>()
+class Strategy(private val base: Location, private val jobs: List<Location>) {
+    private val workers = mutableListOf<Worker>()
 
     fun execute(): List<Worker> {
         val sortedJobs = jobs.sortedBy { it.endTime }
