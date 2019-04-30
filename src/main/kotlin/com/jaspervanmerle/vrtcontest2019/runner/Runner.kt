@@ -33,13 +33,27 @@ abstract class Runner(val args: Array<String>) {
         return locations
     }
 
-    protected fun printWorkers(workers: List<Worker>) {
+    protected fun printWorkers(workers: List<Worker>, lineNumbers: Boolean) {
+        var line = 1
+
         for (worker in workers) {
             for (action in worker.actions) {
-                println(action.toString())
+                if (lineNumbers) {
+                    println("$line. $action")
+                } else {
+                    println(action.toString())
+                }
+
+                line += 1
             }
 
-            println("end")
+            if (lineNumbers) {
+                println("$line. end")
+            } else {
+                println("end")
+            }
+
+            line += 1
         }
     }
 }

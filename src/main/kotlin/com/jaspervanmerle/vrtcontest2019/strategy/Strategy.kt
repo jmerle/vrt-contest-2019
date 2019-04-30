@@ -9,35 +9,38 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
     private val workers = mutableListOf<Worker>()
 
     fun execute(): List<Worker> {
-        val sortedJobs = jobs.sortedBy { it.endTime }
+        for (job in jobs) {
+            job.distanceToBase = job.distanceTo(base)
+        }
 
-        for (job in sortedJobs) {
-            val availableWorkers = mutableListOf<Pair<Worker, Int>>()
+        val availableJobs = jobs.toMutableList()
 
-            for (worker in workers) {
-                val bestArrivalTime = worker.getBestArrivalTime(job)
-
-                if (bestArrivalTime <= job.latestPossibleArrival) {
-                    availableWorkers += worker to bestArrivalTime
-                }
+        while (true) {
+            if (availableJobs.isEmpty()) {
+                break
             }
 
-            val existingWorkers = availableWorkers.sortedBy { it.second }.take(job.requiredWorkers)
-            val newWorkers = job.requiredWorkers - existingWorkers.size
-
-            val startTime = getJobStartTime(job, existingWorkers)
-
-            for (worker in existingWorkers) {
-                worker.first.addAction(ArriveAction(job, startTime))
-                worker.first.addAction(WorkAction(job, startTime, startTime + job.duration))
-                worker.first.workingUntil = startTime + job.duration
+            for (job in availableJobs) {
+                job.updateCurrentData(workers)
             }
 
-            for (i in 0 until newWorkers) {
-                val worker = Worker(base, startTime - base.distanceTo(job))
-                worker.addAction(ArriveAction(job, startTime))
-                worker.addAction(WorkAction(job, startTime, startTime + job.duration))
-                worker.workingUntil = startTime + job.duration
+            val currentJob = availableJobs.minBy { it.currentStartTime }!!
+            availableJobs.remove(currentJob)
+
+            val startTime = currentJob.currentStartTime
+            val endTime = currentJob.currentEndTime
+
+            for (worker in currentJob.currentExistingWorkers) {
+                worker.addAction(ArriveAction(currentJob, startTime))
+                worker.addAction(WorkAction(currentJob, startTime, endTime))
+                worker.workingUntil = endTime
+            }
+
+            for (i in 0 until currentJob.currentNewWorkers) {
+                val worker = Worker(base, startTime - currentJob.distanceToBase)
+                worker.addAction(ArriveAction(currentJob, startTime))
+                worker.addAction(WorkAction(currentJob, startTime, endTime))
+                worker.workingUntil = endTime
                 workers += worker
             }
         }

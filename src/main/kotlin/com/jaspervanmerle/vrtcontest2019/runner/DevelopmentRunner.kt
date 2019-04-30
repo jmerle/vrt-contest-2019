@@ -36,7 +36,7 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
             }
 
             if (args.size == 1) {
-                printWorkers(workers)
+                printWorkers(workers, true)
                 println()
             }
 

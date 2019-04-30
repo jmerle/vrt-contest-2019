@@ -21,4 +21,6 @@ fun log(vararg messages: Any?) {
             System.err.print(' ')
         }
     }
+
+    System.err.println()
 }

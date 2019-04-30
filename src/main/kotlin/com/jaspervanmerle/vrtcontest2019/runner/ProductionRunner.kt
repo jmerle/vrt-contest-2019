@@ -7,6 +7,6 @@ class ProductionRunner(args: Array<String>) : Runner(args) {
         val ir = InputReader(System.`in`)
         val locations = readLocations(ir)
         val workers = executeStrategy(locations)
-        printWorkers(workers)
+        printWorkers(workers, false)
     }
 }
