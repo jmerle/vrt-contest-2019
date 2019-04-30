@@ -65,7 +65,7 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
         }
 
         for (location in completedLocations) {
-            rewardedCredits += location.duration * location.requiredWorkers * (location.requiredWorkers + 5)
+            rewardedCredits += location.reward
         }
 
         return (rewardedCredits - workerCost).toDouble() / 1000.0

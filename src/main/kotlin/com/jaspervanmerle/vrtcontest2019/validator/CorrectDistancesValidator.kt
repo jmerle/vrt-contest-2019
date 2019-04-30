@@ -25,12 +25,11 @@ class CorrectDistancesValidator : Validator() {
                         else -> 0
                     }
 
-                    val dx = Math.abs(actionA.location.x - actionB.location.x)
-                    val dy = Math.abs(actionA.location.y - actionB.location.y)
+                    val distance = actionA.location.getDistance(actionB.location)
                     val timeDifference = Math.abs(timeA - timeB)
 
-                    if (dx + dy < timeDifference) {
-                        throw Error("There's not enough time to travel between location ${actionA.location.id} and location ${actionB.location.id} (required time is ${dx + dy}, time difference between actions is $timeDifference)")
+                    if (distance > timeDifference) {
+                        throw Error("There's not enough time to travel between location ${actionA.location.id} and location ${actionB.location.id} (distance is ${distance}, time difference between actions is $timeDifference)")
                     }
                 }
             }

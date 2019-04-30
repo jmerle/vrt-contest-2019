@@ -8,4 +8,10 @@ data class Location(
     val requiredWorkers: Int,
     val startTime: Int,
     val endTime: Int
-)
+) {
+    val reward = duration * requiredWorkers * (requiredWorkers + 5)
+
+    fun getDistance(other: Location): Int {
+        return Math.abs(x - other.x) + Math.abs(y - other.y)
+    }
+}

@@ -17,7 +17,7 @@ class CorrectActionsValidator : Validator() {
                 throw Error("All workers need to have an arrive action as last action")
             }
 
-            if (worker.actions.any { it is WorkAction }) {
+            if (!worker.actions.any { it is WorkAction }) {
                 throw Error("All workers need at least one work action")
             }
 
