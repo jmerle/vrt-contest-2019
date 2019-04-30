@@ -24,6 +24,7 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
     )
 
     override fun run() {
+        var totalScore = 0.0
         val numberFormat = NumberFormat.getNumberInstance(Locale.US)
 
         for (testName in args) {
@@ -41,11 +42,15 @@ class DevelopmentRunner(args: Array<String>) : Runner(args) {
             }
 
             val score = getScore(workers)
-            val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
+            totalScore += score
 
             val formattedScore = numberFormat.format(score)
+            val jobs = workers.flatMap { it.actions }.filter { it is WorkAction }.map { it.location }.distinct()
+
             println("Score for test $testName (${locations.size} locations, ${jobs.size} completed jobs, ${workers.size} workers): $formattedScore")
         }
+
+        println("Total score: $totalScore")
     }
 
     private fun getScore(workers: List<Worker>): Double {

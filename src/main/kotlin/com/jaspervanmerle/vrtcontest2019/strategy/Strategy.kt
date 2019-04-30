@@ -21,7 +21,7 @@ class Strategy(val locations: List<Location>) {
             for (worker in workers) {
                 val bestArrivalTime = worker.getBestArrivalTime(job)
 
-                if (bestArrivalTime <= job.latestPossibleArrival && worker.location.distanceTo(job) < distanceFromBase) {
+                if (bestArrivalTime <= job.latestPossibleArrival) {
                     availableWorkers += worker to bestArrivalTime
                 }
             }
