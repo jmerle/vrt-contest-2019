@@ -20,25 +20,24 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
                 break
             }
 
-            var bestJob: Location? = null
+            var currentJob: Location? = null
             var bestStartTime = Int.MAX_VALUE
 
             for (job in availableJobs) {
                 if (job.startTime < bestStartTime) {
                     job.updateCurrentData(workers)
 
-                    if (job.currentProfitable && job.currentStartTime < bestStartTime) {
-                        bestJob = job
+                    if (job.currentProfit >= 0 && (job.currentStartTime < bestStartTime || (job.currentStartTime == bestStartTime && job.currentProfit > currentJob!!.currentProfit))) {
+                        currentJob = job
                         bestStartTime = job.currentStartTime
                     }
                 }
             }
 
-            if (bestJob == null) {
+            if (currentJob == null) {
                 break
             }
 
-            val currentJob = bestJob!!
             availableJobs.remove(currentJob)
 
             val startTime = currentJob.currentStartTime

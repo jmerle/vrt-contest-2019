@@ -14,7 +14,7 @@ class Location(
 
     var distanceToBase = 0
 
-    var currentProfitable = false
+    var currentProfit = 0
     var currentStartTime = 0
     var currentEndTime = 0
     var currentNewWorkers = 0
@@ -68,7 +68,7 @@ class Location(
             costs += currentStartTime - worker.workingUntil
         }
 
-        currentProfitable = costs <= reward
+        currentProfit = reward - costs
     }
 
     private fun getJobStartTime(existingWorkers: Collection<Pair<Worker, Int>>): Int {
