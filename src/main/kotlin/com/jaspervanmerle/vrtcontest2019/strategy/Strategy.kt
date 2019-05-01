@@ -20,11 +20,21 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
                 break
             }
 
+            var bestJob: Location? = null
+            var bestStartTime = Int.MAX_VALUE
+
             for (job in availableJobs) {
-                job.updateCurrentData(workers)
+                if (job.startTime < bestStartTime) {
+                    job.updateCurrentData(workers)
+
+                    if (job.currentStartTime < bestStartTime) {
+                        bestJob = job
+                        bestStartTime = job.currentStartTime
+                    }
+                }
             }
 
-            val currentJob = availableJobs.minBy { it.currentStartTime }!!
+            val currentJob = bestJob!!
             availableJobs.remove(currentJob)
 
             val startTime = currentJob.currentStartTime
@@ -51,28 +61,5 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
         }
 
         return workers
-    }
-
-    private fun getJobStartTime(job: Location, existingAvailableWorkers: List<Pair<Worker, Int>>): Int {
-        val distanceFromBase = base.distanceTo(job)
-        val requiredNewWorkers = job.requiredWorkers - existingAvailableWorkers.size
-
-        var earliestStart = if (existingAvailableWorkers.isEmpty()) {
-            job.startTime
-        } else {
-            existingAvailableWorkers.maxBy { it.second }!!.second
-        }
-
-        if (requiredNewWorkers > 0) {
-            if (earliestStart < distanceFromBase) {
-                earliestStart = distanceFromBase
-            }
-        }
-
-        if (earliestStart < job.startTime) {
-            earliestStart = job.startTime
-        }
-
-        return earliestStart
     }
 }

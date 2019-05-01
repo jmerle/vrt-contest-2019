@@ -56,16 +56,14 @@ class Location(
             }
         }
 
-        // val existingWorkers = currentAvailableWorkers.sortedBy { it.second }.take(requiredWorkers)
-
-        currentExistingWorkers = currentAvailableWorkers.map { it.first }
+        currentExistingWorkers = currentAvailableWorkers.map { it.first }.take(requiredWorkers)
         currentNewWorkers = requiredWorkers - currentExistingWorkers.size
 
         currentStartTime = getJobStartTime(currentAvailableWorkers)
         currentEndTime = currentStartTime + duration
     }
 
-    private fun getJobStartTime(existingWorkers: List<Pair<Worker, Int>>): Int {
+    private fun getJobStartTime(existingWorkers: Collection<Pair<Worker, Int>>): Int {
         var earliestStart = if (existingWorkers.isEmpty()) {
             startTime
         } else {
