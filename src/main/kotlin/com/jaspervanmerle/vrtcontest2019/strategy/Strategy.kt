@@ -27,11 +27,15 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
                 if (job.startTime < bestStartTime) {
                     job.updateCurrentData(workers)
 
-                    if (job.currentStartTime < bestStartTime) {
+                    if (job.currentProfitable && job.currentStartTime < bestStartTime) {
                         bestJob = job
                         bestStartTime = job.currentStartTime
                     }
                 }
+            }
+
+            if (bestJob == null) {
+                break
             }
 
             val currentJob = bestJob!!

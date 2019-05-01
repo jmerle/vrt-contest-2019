@@ -14,6 +14,7 @@ class Location(
 
     var distanceToBase = 0
 
+    var currentProfitable = false
     var currentStartTime = 0
     var currentEndTime = 0
     var currentNewWorkers = 0
@@ -28,11 +29,11 @@ class Location(
         for (worker in workers) {
             val bestArrivalTime = worker.getBestArrivalTime(this)
 
-            if (bestArrivalTime <= latestPossibleArrival && (currentWorst == 0 || currentAvailableWorkers.size < requiredWorkers || bestArrivalTime < currentWorst)) {
+            if (bestArrivalTime <= latestPossibleArrival && (currentAvailableWorkers.size < requiredWorkers || bestArrivalTime < currentWorst)) {
                 if (currentAvailableWorkers.size < requiredWorkers) {
                     currentAvailableWorkers += worker to bestArrivalTime
 
-                    if (currentWorst == 0 || bestArrivalTime > currentWorst) {
+                    if (bestArrivalTime > currentWorst) {
                         currentWorst = bestArrivalTime
                     }
 
@@ -45,7 +46,7 @@ class Location(
                             currentAvailableWorkers.add(i, worker to bestArrivalTime)
                             currentAvailableWorkers.removeAt(currentAvailableWorkers.size - 1)
 
-                            if (currentWorst == 0 || bestArrivalTime > currentWorst) {
+                            if (bestArrivalTime > currentWorst) {
                                 currentWorst = bestArrivalTime
                             }
 
@@ -56,11 +57,18 @@ class Location(
             }
         }
 
-        currentExistingWorkers = currentAvailableWorkers.map { it.first }.take(requiredWorkers)
+        currentExistingWorkers = currentAvailableWorkers.map { it.first }
         currentNewWorkers = requiredWorkers - currentExistingWorkers.size
 
         currentStartTime = getJobStartTime(currentAvailableWorkers)
         currentEndTime = currentStartTime + duration
+
+        var costs = requiredWorkers * duration + currentNewWorkers * distanceToBase
+        for (worker in currentExistingWorkers) {
+            costs += currentStartTime - worker.workingUntil
+        }
+
+        currentProfitable = costs <= reward
     }
 
     private fun getJobStartTime(existingWorkers: Collection<Pair<Worker, Int>>): Int {
