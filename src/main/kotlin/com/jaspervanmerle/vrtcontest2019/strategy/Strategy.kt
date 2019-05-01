@@ -1,5 +1,6 @@
 package com.jaspervanmerle.vrtcontest2019.strategy
 
+import com.jaspervanmerle.vrtcontest2019.io.log
 import com.jaspervanmerle.vrtcontest2019.model.Location
 import com.jaspervanmerle.vrtcontest2019.model.Worker
 import com.jaspervanmerle.vrtcontest2019.model.action.ArriveAction
@@ -27,9 +28,35 @@ class Strategy(private val base: Location, private val jobs: List<Location>) {
                 if (job.startTime < bestStartTime) {
                     job.updateCurrentData(workers)
 
-                    if (job.currentProfit >= 0 && (job.currentStartTime < bestStartTime - 10 || (job.currentStartTime <= bestStartTime && (job.currentExistingWorkers.size > currentJob!!.currentExistingWorkers.size || (job.currentExistingWorkers.size == currentJob.currentExistingWorkers.size && job.currentProfit > currentJob.currentProfit))))) {
+                    if (job.currentProfit < 0) {
+                        continue
+                    }
+
+                    if (job.currentStartTime > bestStartTime) {
+                        continue
+                    }
+
+                    if (currentJob == null) {
                         currentJob = job
                         bestStartTime = job.currentStartTime
+                        continue
+                    }
+
+                    if (job.currentStartTime < bestStartTime - 10) {
+                        currentJob = job
+                        bestStartTime = job.currentStartTime
+                        continue
+                    }
+
+                    if (job.currentStartTime <= bestStartTime) {
+                        val jobExistingWorkers = job.currentExistingWorkers.size
+                        val currentExistingWorkers = currentJob.currentExistingWorkers.size
+
+                        if (jobExistingWorkers >= currentExistingWorkers) {
+                            currentJob = job
+                            bestStartTime = job.currentStartTime
+                            continue
+                        }
                     }
                 }
             }
